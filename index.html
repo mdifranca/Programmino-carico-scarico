@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Magazzino Lounge Bar</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Gestione carico / scarico</p>
+          <h1>Magazzino lounge bar</h1>
+          <p class="hero-copy">
+            Tieni sotto controllo bottiglie e merce, registra i movimenti e ricevi
+            un avviso quando è ora di riordinare.
+          </p>
+          <p class="network-note">
+            Link rete locale:
+            <a id="networkLink" href="#" target="_blank" rel="noreferrer">caricamento...</a>
+          </p>
+        </div>
+        <div class="hero-stats" id="heroStats"></div>
+      </header>
+
+      <main class="grid">
+        <section class="card">
+          <div class="card-heading">
+            <div>
+              <p class="section-tag">Prodotti</p>
+              <h2>Nuovo prodotto</h2>
+            </div>
+          </div>
+          <form id="productForm" class="stack-form">
+            <label>
+              Prodotto
+              <input type="text" id="productName" placeholder="Es. Gin premium 0,7L" required />
+            </label>
+            <div class="form-grid">
+              <label>
+                Quantita iniziale
+                <input type="number" id="productQty" min="0" step="0.01" value="0" required />
+              </label>
+              <label>
+                Soglia alert
+                <input type="number" id="productAlert" min="0" step="0.01" value="0" required />
+              </label>
+            </div>
+            <label>
+              Unita
+              <input type="text" id="productUnit" placeholder="Es. bottiglie, pezzi, lattine" value="bottiglie" />
+            </label>
+            <div class="form-grid">
+              <label>
+                Categoria
+                <select id="productCategory">
+                  <option value="alcol">Alcol</option>
+                  <option value="soft">Soft drink</option>
+                  <option value="altro">Altro</option>
+                </select>
+              </label>
+              <label>
+                Bottiglie per cassa
+                <input type="number" id="productCaseSize" min="1" step="1" value="6" required />
+              </label>
+            </div>
+            <button type="submit" class="primary" id="productSubmitLabel">Salva prodotto</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <div class="card-heading">
+            <div>
+              <p class="section-tag">Movimenti</p>
+              <h2>Carico o scarico</h2>
+            </div>
+          </div>
+          <form id="movementForm" class="stack-form">
+            <label>
+              Prodotto
+              <select id="movementProduct" required></select>
+            </label>
+            <div class="form-grid">
+              <label>
+                Operazione
+                <select id="movementType" required>
+                  <option value="load">Carico</option>
+                  <option value="unload">Scarico</option>
+                </select>
+              </label>
+              <label>
+                Quantita
+                <input type="number" id="movementQty" min="0.01" step="0.01" required />
+              </label>
+            </div>
+            <label>
+              Nota
+              <input type="text" id="movementNote" placeholder="Es. Fattura fornitore / consumo sala" />
+            </label>
+            <button type="submit" class="primary">Registra movimento</button>
+          </form>
+        </section>
+
+        <section class="card card-wide">
+          <div class="card-heading split">
+            <div>
+              <p class="section-tag">Import</p>
+              <h2>Fatture PDF e file di magazzino</h2>
+            </div>
+            <span class="hint">OCR PDF, TXT e CSV con analisi di bott / cass</span>
+          </div>
+          <div class="import-layout">
+            <div class="stack-form">
+              <label>
+                Tipo documento
+                <select id="importMode">
+                  <option value="load">Fattura / carico</option>
+                  <option value="unload">Scarico magazzino</option>
+                </select>
+              </label>
+              <label class="file-drop">
+                Carica file
+                <input type="file" id="importFile" accept=".pdf,.txt,.csv" />
+              </label>
+              <label>
+                Oppure incolla il testo
+                <textarea
+                  id="importText"
+                  rows="8"
+                  placeholder="Es. Campari 6&#10;Tonica premium 24&#10;Vodka 3"
+                ></textarea>
+              </label>
+              <div class="form-actions">
+                <button type="button" id="parseImport" class="secondary">Analizza documento</button>
+                <button type="button" id="applyImport" class="primary">Applica righe importate</button>
+              </div>
+              <p class="muted">
+                Riconosce anche abbreviazioni tipo `bott`, `bt`, `cass`, `cassa`, `casse`.
+                Le casse valgono in automatico 24 per i soft e 6 per gli alcolici, ma il valore viene adattato se il prodotto ha una cassa personalizzata.
+              </p>
+              <p class="muted" id="importStatus">Nessun documento analizzato.</p>
+            </div>
+
+            <div class="import-preview">
+              <div class="preview-header">
+                <h3>Anteprima righe importate</h3>
+                <button type="button" id="clearImport" class="ghost">Svuota</button>
+              </div>
+              <div id="importRows" class="import-rows empty-state">
+                Nessuna riga analizzata.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card card-wide">
+          <div class="card-heading split">
+            <div>
+              <p class="section-tag">Export</p>
+              <h2>Esporta i dati</h2>
+            </div>
+          </div>
+          <div class="export-links">
+            <a id="exportProducts" class="export-link" href="#">CSV prodotti</a>
+            <a id="exportMovements" class="export-link" href="#">CSV movimenti</a>
+            <a id="exportBackup" class="export-link" href="#">Backup JSON</a>
+          </div>
+        </section>
+
+        <section class="card card-wide">
+          <div class="card-heading split">
+            <div>
+              <p class="section-tag">Giacenze</p>
+              <h2>Prodotti a magazzino</h2>
+            </div>
+            <input type="search" id="searchProducts" placeholder="Cerca prodotto..." />
+          </div>
+          <div id="inventoryTableWrap"></div>
+        </section>
+
+        <section class="card card-wide">
+          <div class="card-heading">
+            <div>
+              <p class="section-tag">Storico</p>
+              <h2>Ultimi movimenti</h2>
+            </div>
+          </div>
+          <div id="historyTableWrap"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="importRowTemplate">
+      <div class="import-row">
+        <input type="text" class="import-product" placeholder="Prodotto" />
+        <input type="number" class="import-qty" min="0.01" step="0.01" placeholder="Quantita" />
+        <span class="import-meta"></span>
+        <button type="button" class="ghost remove-import-row">Rimuovi</button>
+      </div>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
