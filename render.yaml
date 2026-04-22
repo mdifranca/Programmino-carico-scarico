@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: magazzino-lounge-bar
+    runtime: docker
+    region: frankfurt
+    plan: starter
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: MAGAZZINO_DATA_DIR
+        value: /data
+    disk:
+      name: magazzino-data
+      mountPath: /data
+      sizeGB: 1
